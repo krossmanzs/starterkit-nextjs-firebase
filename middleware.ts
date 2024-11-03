@@ -1,4 +1,5 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 import {
   authMiddleware,
   redirectToHome,
@@ -9,58 +10,49 @@ import { authConfig } from "./config/server-config";
 const PUBLIC_PATHS = ["/register", "/login", "/reset-password"];
 
 export async function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
+  return authMiddleware(request, {
+    loginPath: "/api/login",
+    logoutPath: "/api/logout",
+    refreshTokenPath: "/api/refresh-token",
+    debug: false,
+    enableMultipleCookies: authConfig.enableMultipleCookies,
+    apiKey: authConfig.apiKey,
+    cookieName: authConfig.cookieName,
+    cookieSerializeOptions: authConfig.cookieSerializeOptions,
+    cookieSignatureKeys: authConfig.cookieSignatureKeys,
+    serviceAccount: authConfig.serviceAccount,
+    handleValidToken: async ({ token, decodedToken, customToken }, headers) => {
+      // Authenticated user should not be able to access /login, /register and /reset-password routes
+      if (PUBLIC_PATHS.includes(request.nextUrl.pathname)) {
+        return redirectToHome(request);
+      }
 
-  if (pathname.startsWith("/dashboard") || pathname.startsWith("/api")) {
-    return authMiddleware(request, {
-      loginPath: "/api/login",
-      logoutPath: "/api/logout",
-      refreshTokenPath: "/api/refresh-token",
-      enableMultipleCookies: authConfig.enableMultipleCookies,
-      apiKey: authConfig.apiKey,
-      cookieName: authConfig.cookieName,
-      cookieSerializeOptions: authConfig.cookieSerializeOptions,
-      cookieSignatureKeys: authConfig.cookieSignatureKeys,
-      serviceAccount: authConfig.serviceAccount,
-      handleValidToken: async (
-        { token, decodedToken, customToken },
-        headers
-      ) => {
-        // Authenticated user should not be able to access /login, /register and /reset-password routes
-        if (PUBLIC_PATHS.includes(request.nextUrl.pathname)) {
-          return redirectToHome(request);
-        }
+      return NextResponse.next({
+        request: {
+          headers,
+        },
+      });
+    },
+    handleInvalidToken: async (_reason) => {
+      return redirectToLogin(request, {
+        path: "/login",
+        publicPaths: PUBLIC_PATHS,
+      });
+    },
+    handleError: async (error) => {
+      console.error("Unhandled authentication error", { error });
 
-        return NextResponse.next({
-          request: {
-            headers,
-          },
-        });
-      },
-      handleInvalidToken: async (_reason) => {
-        return redirectToLogin(request, {
-          path: "/login",
-          publicPaths: PUBLIC_PATHS,
-        });
-      },
-      handleError: async (error) => {
-        console.error("Unhandled authentication error", { error });
-
-        return redirectToLogin(request, {
-          path: "/login",
-          publicPaths: PUBLIC_PATHS,
-        });
-      },
-    });
-  }
-
-  return NextResponse.next();
+      return redirectToLogin(request, {
+        path: "/login",
+        publicPaths: PUBLIC_PATHS,
+      });
+    },
+  });
 }
 
 export const config = {
   matcher: [
     "/",
-    // "/admin/:path*",
     "/((?!_next|favicon.ico|__/auth|__/firebase|api|.*\\.).*)",
     "/api/login",
     "/api/logout",

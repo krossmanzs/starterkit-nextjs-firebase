@@ -24,12 +24,12 @@ function CardDetail({ imgUrl, caption, id, isLoading = false }: CardProps) {
           <>
             <Image
               src={imgUrl}
-              className="rounded-xl h-[70%] object-cover hover:scale-105 transition-transform"
+              className="rounded-xl h-[70%] object-cover hover:scale-105 transition-transform mb-3"
               width={1080}
               height={1080}
               alt="Gambar Detail"
             />
-            <p className="text-white font-bold text-center my-auto text-xl font-belanosima">
+            <p className="text-white text-sm md:text-xl font-bold text-center my-auto font-belanosima">
               {caption}
             </p>
           </>

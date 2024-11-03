@@ -4,17 +4,17 @@ import React from "react";
 
 function Footer() {
   return (
-    <div className="bg-gradient-to-b from-[#E76824] to-[#4D2B28] w-full mt-4 rounded-t-xl flex gap-6 pl-16 py-4 text-justify justify-center items-center  pb-16 font-belanosima">
-      <div className="container flex justify-between">
-        <div className="w-[30%]">
-          <p className="text-white font-bold text-3xl">MENGAN PAI</p>
-          <p className="text-white">
+    <div className="bg-gradient-to-b text-sm from-[#E76824] to-[#4D2B28] w-full px-8 mt-4 rounded-t-xl flex md:gap-6 md:pl-16 py-4 text-justify justify-center items-center  pb-16 font-belanosima">
+      <div className="container flex flex-col md:flex-row gap-3 justify-between">
+        <div className="md:w-[30%]">
+          <p className="text-white font-bold text-lg md:text-3xl">MENGAN PAI</p>
+          <p className="text-white text-sm">
             Temukan berbagai kuliner di Bandar Lampung lengkap dengan rating,
             lokasi, jam buka, harga, dan ulasan di Mengan Pai
           </p>
         </div>
-        <div className="w-[20%]">
-          <p className="text-white font-bold text-3xl">Menu</p>
+        <div className="md:w-[20%]">
+          <p className="text-white font-bold text-lg md:text-3xl">Menu</p>
           <ul>
             <li>
               <Link href="/">
@@ -26,9 +26,11 @@ function Footer() {
             </li>
           </ul>
         </div>
-        <div className="w-[20%]">
-          <p className="text-white font-bold text-3xl">Kontak Kami</p>
-          <ul>
+        <div className="md:w-[20%]">
+          <p className="text-white font-bold text-lg md:text-3xl">
+            Kontak Kami
+          </p>
+          <ul className="space-y-2">
             <li className="flex gap-1 text-white">
               <Instagram />
               @mengan.Pai

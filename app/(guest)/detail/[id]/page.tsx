@@ -62,12 +62,12 @@ function Page({ params }: { params: { id: string } }) {
   }, []);
 
   return (
-    <div className="container">
+    <div className="container mx-auto px-4 sm:px-6 lg:px-8">
       {/* Skeleton atau Gambar */}
       {loading ? (
-        <div className="animate-pulse bg-gray-300 w-full h-[400px] rounded-xl"></div>
+        <div className="animate-pulse bg-gray-300 w-full h-[300px] md:h-[400px] rounded-xl"></div>
       ) : (
-        <div className="relative w-full h-[400px]">
+        <div className="relative w-full h-[300px] md:h-[400px]">
           <Image
             src={
               dataKuliner?.imageUrls[0] ||
@@ -76,14 +76,14 @@ function Page({ params }: { params: { id: string } }) {
             className="rounded-xl object-cover object-center"
             layout="fill"
             quality={90}
-            alt="Gambar Bakso"
+            alt="Gambar Kuliner"
           />
         </div>
       )}
 
-      <div className="bg-gradient-to-b from-[#E76824] to-[#4D2B28] w-full mt-4 rounded-xl flex flex-col gap-6 p-4 text-justify">
+      <div className="bg-gradient-to-b from-[#E76824] to-[#4D2B28] mt-4 rounded-xl flex flex-col gap-6 p-4 md:p-6 lg:p-8 text-justify">
         {/* Skeleton atau Nama Kuliner */}
-        <div className="text-white font-bold text-3xl font-belanosima">
+        <div className="text-white font-bold text-2xl md:text-3xl font-belanosima">
           {loading ? (
             <div className="animate-pulse bg-gray-300 h-8 w-1/2 rounded-md"></div>
           ) : (
@@ -92,7 +92,7 @@ function Page({ params }: { params: { id: string } }) {
         </div>
 
         {/* Skeleton atau Deskripsi */}
-        <div className="bg-white rounded-xl p-4 font-belanosima">
+        <div className="bg-white rounded-xl p-3 md:p-4 font-belanosima">
           {loading ? (
             <div className="animate-pulse space-y-2">
               <div className="bg-gray-300 h-4 rounded-md w-full"></div>
@@ -105,8 +105,8 @@ function Page({ params }: { params: { id: string } }) {
         </div>
 
         {/* Skeleton atau Alamat */}
-        <div className="bg-white rounded-xl p-4">
-          <p className="font-bold text-xl font-belanosima">ALAMAT</p>
+        <div className="bg-white rounded-xl p-3 md:p-4">
+          <p className="font-bold text-lg md:text-xl font-belanosima">ALAMAT</p>
           {loading ? (
             <div className="animate-pulse bg-gray-300 h-4 w-3/4 rounded-md"></div>
           ) : (
@@ -114,10 +114,25 @@ function Page({ params }: { params: { id: string } }) {
           )}
         </div>
 
+        {/* Skeleton atau Jam kerja */}
+        <div className="bg-white rounded-xl p-3 md:p-4">
+          <p className="font-bold text-lg md:text-xl font-belanosima">
+            JAM KERJA
+          </p>
+          {loading ? (
+            <div className="animate-pulse bg-gray-300 h-4 w-3/4 rounded-md"></div>
+          ) : (
+            <div>
+              <p>{`${dataKuliner?.workingDays}`}</p>
+              <p>{`${dataKuliner?.workingHours.start} - ${dataKuliner?.workingHours.stop}`}</p>
+            </div>
+          )}
+        </div>
+
         {/* Skeleton atau Review */}
-        <div className="bg-white rounded-xl p-4">
-          <p className="font-bold text-xl font-belanosima">REVIEW</p>
-          <ScrollArea className="h-36">
+        <div className="bg-white rounded-xl p-3 md:p-4">
+          <p className="font-bold text-lg md:text-xl font-belanosima">REVIEW</p>
+          <ScrollArea className="h-24 md:h-36">
             {loading ? (
               [...Array(4)].map((_, index) => (
                 <div
@@ -138,11 +153,11 @@ function Page({ params }: { params: { id: string } }) {
       </div>
 
       {/* Rekomendasi Lainnya */}
-      <div>
-        <p className="font-bold text-xl py-6 text-center">
+      <div className="py-6">
+        <p className="font-bold text-lg md:text-xl text-center">
           Rekomendasi Lainnya:
         </p>
-        <div className="flex gap-4 justify-around px-32">
+        <div className="flex gap-4 justify-center lg:justify-around md:px-16 lg:px-32">
           <Carousel
             plugins={[
               Autoplay({
@@ -158,15 +173,15 @@ function Page({ params }: { params: { id: string } }) {
                 ? [...Array(6)].map((_, index) => (
                     <CarouselItem
                       key={index}
-                      className="md:basis-1/2 lg:basis-1/4 w-48"
+                      className="md:basis-1/2 lg:basis-1/4 w-5 md:w-48"
                     >
-                      <div className="animate-pulse bg-gray-300 h-64 w-full rounded-md"></div>
+                      <div className="animate-pulse bg-gray-300 h-48 md:h-64 w-full rounded-md"></div>
                     </CarouselItem>
                   ))
                 : dataLainnya.map((item, index) => (
                     <CarouselItem
                       key={index}
-                      className="md:basis-1/2 lg:basis-1/4"
+                      className="basis-1/3 md:basis-1/2 lg:basis-1/4 w-16 md:w-48"
                     >
                       <div className="p-1">
                         <CardDetail

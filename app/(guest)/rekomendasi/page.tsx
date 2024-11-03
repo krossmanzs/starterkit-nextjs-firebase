@@ -50,10 +50,10 @@ function Page() {
     <div className="flex flex-col items-center gap-8">
       <SearchBar />
 
-      <div className="bg-gradient-to-l shadow-xl from-[#E76824] to-[#4D2B28] rounded-3xl p-4 flex justify-between items-center shadow-lg">
+      <div className=" bg-gradient-to-l shadow-xl from-[#E76824] to-[#4D2B28] rounded-3xl flex justify-between items-center">
         {/* Text Content */}
         <div className="text-left p-5">
-          <h2 className="text-yellow-400 font-bold text-4xl mb-2">
+          <h2 className="text-yellow-400 font-bold text-lg md:text-2xl lg:text-4xl mb-2">
             Ini adalah kuliner lampung yang kami rekomendasikan, semoga kamu
             suka ya..
           </h2>
@@ -68,12 +68,16 @@ function Page() {
         </div>
 
         {/* Image */}
-        <div className="rounded-xl overflow-hidden">
-          <img src="/images/kuliner.png" alt="Kuliner Image" />
+        <div className="hidden md:block rounded-xl overflow-hidden">
+          <img
+            className="h-full"
+            src="/images/kuliner.png"
+            alt="Kuliner Image"
+          />
         </div>
       </div>
 
-      <div className="grid grid-cols-3 gap-20 justify-center items-center py-8 ">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-20 justify-center items-center py-8 ">
         {loading
           ? Array.from({ length: 3 }).map((_, index) => (
               <SkeletonCard key={index} />

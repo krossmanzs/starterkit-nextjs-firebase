@@ -25,16 +25,14 @@ export default function page() {
           <h2 className="text-2xl font-bold tracking-tight">
             Selamat Datang 👋
           </h2>
-          <div className="hidden items-center space-x-2 md:flex">
-            <h1>
-              Untuk menambahkan data kuliner, silahkan klik tombol di bawah ini
-            </h1>
-            <Button onClick={() => router.push("/dashboard/kuliner")}>
-              Kuliner
-            </Button>
-          </div>
+          <div className="hidden items-center space-x-2 md:flex"></div>
         </div>
-        <Breadcrumbs items={breadcrumbItems} />
+        <h1>
+          Untuk menambahkan data kuliner, silahkan klik tombol di bawah ini
+        </h1>
+        <Button onClick={() => router.push("/dashboard/kuliner")}>
+          Kuliner
+        </Button>
       </div>
     </PageContainer>
   );

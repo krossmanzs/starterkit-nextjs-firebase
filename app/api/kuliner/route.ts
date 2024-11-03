@@ -115,52 +115,50 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(url.searchParams.get("limit") || "10", 10);
     const search = url.searchParams.get("search") || ""; // Ambil query pencarian
     const isRandom = url.searchParams.get("random") === "true"; // Mode random
+    const id = url.searchParams.get("id") || null; // Parameter ID untuk detail
     const offset = (page - 1) * limit;
 
+    // Jika ada parameter ID, ambil data kuliner berdasarkan ID tersebut
+    if (id) {
+      const doc = await db.collection("kuliner").doc(id).get();
+      if (!doc.exists) {
+        return NextResponse.json(
+          { message: "Kuliner not found" },
+          { status: 404 }
+        );
+      }
+      return NextResponse.json({ kuliner: { id: doc.id, ...doc.data() } });
+    }
+
+    // Jika tidak ada ID, lanjutkan dengan fitur lama (pencarian, random, pagination)
     let kulinerList = [];
     let totalItems = 0;
 
+    // Ambil semua data dari koleksi "kuliner"
+    const snapshot = await db
+      .collection("kuliner")
+      .orderBy("createdAt", "desc")
+      .get();
+    const allData = snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+    totalItems = allData.length;
+
+    // Filter data berdasarkan pencarian substring jika ada parameter "search"
+    const filteredData = allData.filter((item: Kuliner) =>
+      search
+        ? item.name && item.name.toLowerCase().includes(search.toLowerCase())
+        : true
+    );
+
     if (isRandom) {
-      // Mode random: ambil semua data dan pilih secara acak
-      const snapshot = await db.collection("kuliner").get();
-      totalItems = snapshot.size;
-
-      const allData = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-
-      // Filter pencarian di mode random, jika ada
-      const filteredData = allData.filter((item: Kuliner) =>
-        search
-          ? item.name && item.name.toLowerCase().includes(search.toLowerCase())
-          : true
-      );
-
-      // Acak hasil dan batasi ke jumlah limit
+      // Mode random: acak hasil dan batasi ke jumlah "limit"
       kulinerList = filteredData
         .sort(() => 0.5 - Math.random())
         .slice(0, limit);
     } else {
-      // Mode normal: ambil semua data terlebih dahulu untuk memungkinkan filter substring
-      const snapshot = await db
-        .collection("kuliner")
-        .orderBy("createdAt", "desc")
-        .get();
-      const allData = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-      totalItems = allData.length;
-
-      // Filter pencarian substring secara manual
-      const filteredData = allData.filter((item: Kuliner) =>
-        search
-          ? item.name && item.name.toLowerCase().includes(search.toLowerCase())
-          : true
-      );
-
-      // Ambil hasil berdasarkan offset dan limit
+      // Mode normal: paginasi hasil berdasarkan "offset" dan "limit"
       kulinerList = filteredData.slice(offset, offset + limit);
     }
 
@@ -168,12 +166,61 @@ export async function GET(request: NextRequest) {
       kuliner: kulinerList,
       totalItems,
       currentPage: isRandom ? null : page,
-      totalPages: isRandom ? null : Math.ceil(totalItems / limit),
+      totalPages: isRandom ? null : Math.ceil(filteredData.length / limit),
     });
   } catch (error) {
     console.error("Error fetching kuliner:", error);
     return NextResponse.json(
       { message: "Failed to fetch kuliner", error: String(error) },
+      { status: 500 }
+    );
+  }
+}
+
+export async function DELETE(request: NextRequest) {
+  const firebaseAdminApp = getFirebaseAdminApp();
+  const db = getFirestore(firebaseAdminApp);
+  const storage = getFirebaseStorage();
+
+  try {
+    // Mengambil ID dari parameter URL
+    const url = new URL(request.url);
+    const id = url.searchParams.get("id");
+
+    if (!id) {
+      return NextResponse.json({ message: "Missing id" }, { status: 400 });
+    }
+
+    const kulinerRef = db.collection("kuliner").doc(id);
+
+    // Dapatkan data kuliner sebelum menghapus (untuk menghapus gambar jika ada)
+    const kulinerSnapshot = await kulinerRef.get();
+    if (!kulinerSnapshot.exists) {
+      return NextResponse.json(
+        { message: "Kuliner not found" },
+        { status: 404 }
+      );
+    }
+
+    const kulinerData = kulinerSnapshot.data();
+
+    // Hapus gambar dari storage jika ada
+    if (kulinerData?.imageUrls && kulinerData.imageUrls.length > 0) {
+      for (const imageUrl of kulinerData.imageUrls) {
+        const fileName = imageUrl.split("/").pop(); // Ambil nama file dari URL
+        const imageRef = storage.bucket().file(`kuliner_images/${fileName}`);
+        await imageRef.delete(); // Hapus file gambar dari storage
+      }
+    }
+
+    // Hapus dokumen kuliner dari Firestore
+    await kulinerRef.delete();
+
+    return NextResponse.json({ message: "Kuliner deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting kuliner:", error);
+    return NextResponse.json(
+      { message: "Failed to delete kuliner", error: String(error) },
       { status: 500 }
     );
   }

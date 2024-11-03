@@ -39,7 +39,7 @@ function Page({ params }: { params: { id: string } }) {
     setLoading(true);
 
     try {
-      const response1 = await fetch(`/api/kuliner/${params.id}`);
+      const response1 = await fetch(`/api/kuliner?id=${params.id}`);
       const response2 = await fetch("/api/kuliner?limit=6&random=true");
 
       if (!response1.ok || !response2.ok) {

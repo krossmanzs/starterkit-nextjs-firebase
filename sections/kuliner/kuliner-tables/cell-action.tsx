@@ -29,7 +29,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data, onRefresh }) => {
   const onConfirm = async () => {
     // create with axios
     setLoading(true);
-    const response = await fetch(`/api/kuliner/${data.id}`, {
+    const response = await fetch(`/api/kuliner?id=${data.id}`, {
       method: "DELETE",
     });
 
